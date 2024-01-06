@@ -21,3 +21,5 @@ server_scripts {
     'testing/t_server.lua',
     'shared/shared.lua',
 }
+
+version '1.0'
