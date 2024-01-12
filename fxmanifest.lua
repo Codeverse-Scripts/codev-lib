@@ -22,4 +22,4 @@ server_scripts {
     'shared/shared.lua',
 }
 
-version '1.0'
+version '1.1'

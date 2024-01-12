@@ -204,15 +204,3 @@ function Codev.Functions.GetPlayerData()
         print("CODEV: Framework not found.")
     end
 end
-
-function Codev.Functions.TriggerCallback(...)
-    if not Framework then return end
-
-    if CODEV.Framework == "qb" then
-        Framework.Functions.TriggerCallback(...)
-    elseif CODEV.Framework == "esx" then
-        Framework.TriggerServerCallback(...)
-    else
-        print("CODEV: Framework not found.")
-    end
-end

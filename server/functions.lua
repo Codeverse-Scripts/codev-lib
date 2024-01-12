@@ -11,11 +11,6 @@ function Codev.Functions.GetJsonData(resource, name)
 end
 
 function Codev.Functions.SaveJsonData(resource, name, data)
-    local data = LoadResourceFile(resource, name)
-    if not data then
-        print("CODEV: " .. name .. " not found.")
-        return
-    end
     SaveResourceFile(resource, name, json.encode(data), -1)
 end
 
@@ -54,18 +49,6 @@ function Codev.Functions.GetCoreObject()
     end
 end
 
-function Codev.Functions.RegisterServerCallback(...)
-    if not Framework then return end
-
-    if CODEV.Framework == "qb" then
-        Framework.Functions.CreateCallback(...)
-    elseif CODEV.Framework == "esx" then
-        Framework.RegisterServerCallback(...)
-    else
-        print("CODEV: Framework not found.")
-    end
-end
-
 function Codev.Functions.GetPlayer(src)
     if not Framework then return end
 
@@ -74,6 +57,20 @@ function Codev.Functions.GetPlayer(src)
         return player
     elseif CODEV.Framework == "esx" then
         local player = Framework.GetPlayerFromId(src)
+        return player
+    else
+        print("CODEV: Framework not found.")
+    end
+end
+
+function Codev.Functions.GetPlayerFromLicense(license)
+    if not Framework then return end
+
+    if CODEV.Framework == "qb" then
+        local player = Framework.Functions.GetPlayerByLicense(license)
+        return player
+    elseif CODEV.Framework == "esx" then
+        local player = Framework.GetPlayerByLicense(license)
         return player
     else
         print("CODEV: Framework not found.")
@@ -125,7 +122,7 @@ function Codev.Functions.AddMoney(src, mtype, amount, reason)
         player = Codev.Functions.GetPlayer(src)
         if timeOut <= 0 then
             print("CODEV: Timeout while waiting for player.")
-            return
+            return false
         end
     end
 
@@ -136,6 +133,8 @@ function Codev.Functions.AddMoney(src, mtype, amount, reason)
     else
         print("CODEV: Framework not found.")
     end
+
+    return true
 end
 
 function Codev.Functions.RemoveMoney(src, type, amount, reason)
@@ -143,9 +142,6 @@ function Codev.Functions.RemoveMoney(src, type, amount, reason)
     local timeOut = 3000
 
     local player = Codev.Functions.GetPlayer(src)
-    local type = type or "cash"
-    local reason = reason or "Unknown"
-    local playerMoney = Codev.Functions.GetMoney(src, type)
 
     while not player do
         Citizen.Wait(100)
@@ -154,12 +150,17 @@ function Codev.Functions.RemoveMoney(src, type, amount, reason)
         player = Codev.Functions.GetPlayer(src)
         if timeOut <= 0 then
             print("CODEV: Timeout while waiting for player.")
-            return
+            return false
         end
     end
 
+    local type = type or "cash"
+    local reason = reason or "Unknown"
+    local playerMoney = Codev.Functions.GetMoney(src, type)
+
     if playerMoney < amount then
-        amount = playerMoney
+        print("CODEV: Player does not have enough money.")
+        return false
     end
 
     if CODEV.Framework == "qb" then
@@ -169,6 +170,8 @@ function Codev.Functions.RemoveMoney(src, type, amount, reason)
     else
         print("CODEV: Framework not found.")
     end
+
+    return true
 end
 
 function Codev.Functions.HasItem(src, item, amount)
