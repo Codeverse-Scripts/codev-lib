@@ -211,6 +211,43 @@ function Codev.Functions.HasItem(src, item, amount)
     end
 end
 
+function Codev.Functions.GetPlayerName(src)
+    if not Framework then return end
+    local timeOut = 3000
+    local player = Codev.Functions.GetPlayer(src)
+    local name = ""
+
+    if CODEV.Framework == "qb" then
+        while not GetResourceState("qb-core") == "started" do
+            Citizen.Wait(100)
+            timeOut = timeOut - 100
+            print("CODEV: Waiting for qb-core.")
+            if timeOut <= 0 then
+                print("CODEV: Timeout while waiting for qb-core.")
+                return
+            end
+        end
+
+        name = player.PlayerData.charinfo.firstname .. " " .. player.PlayerData.charinfo.lastname
+    elseif CODEV.Framework == "esx" then
+        while not GetResourceState("es_extended") == "started" do
+            Citizen.Wait(100)
+            timeOut = timeOut - 100
+            print("CODEV: Waiting for es_extended.")
+            if timeOut <= 0 then
+                print("CODEV: Timeout while waiting for es_extended.")
+                return
+            end
+        end
+
+        name = player.getName()
+    else
+        print("CODEV: Framework not found.")
+    end
+
+    return name
+end
+
 function Codev.Functions.AddItem(src, item, amount)
     if not Framework then return end
     local timeOut = 3000
